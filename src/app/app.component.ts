@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
-import {Subject, Observable} from 'rxjs';
+import {Observable, Subject} from 'rxjs';
 import {WebcamImage, WebcamInitError, WebcamUtil} from 'ngx-webcam';
+import {WebcamImageStatus, WebcamImageWithMetaData} from '../type_definitions/webcam-image-with-meta-data';
 
 @Component({
   selector: 'app-root',
@@ -25,13 +26,11 @@ export class AppComponent implements OnInit {
   };
   public webcamErrors: WebcamInitError[] = [];
 
-  // latest snapshot
-  public webcamImage: WebcamImage = null;
-
   // webcam snapshot trigger
   private trigger: Subject<void> = new Subject<void>();
   // switch to next / previous / specific webcam; true/false: forward/backwards, string: deviceId
   private nextWebcam: Subject<boolean|string> = new Subject<boolean|string>();
+  public captures: Array<WebcamImageWithMetaData> = [];
 
 
   public ngOnInit(): void {
@@ -62,7 +61,11 @@ export class AppComponent implements OnInit {
 
   public handleImage(webcamImage: WebcamImage): void {
     console.log('received webcam image', webcamImage);
-    this.webcamImage = webcamImage;
+    const imageWithMeta = {} as WebcamImageWithMetaData;
+    imageWithMeta.webcamImage = webcamImage;
+    imageWithMeta.status = WebcamImageStatus.NONE;
+    imageWithMeta.location = this.trackedPosition ? JSON.parse(JSON.stringify(this.trackedPosition)) : null; // clone
+    this.captures.push(imageWithMeta);
   }
 
   public cameraWasSwitched(deviceId: string): void {
@@ -99,5 +102,23 @@ export class AppComponent implements OnInit {
   toLocaleString(timestamp: number): string {
     const myDate = new Date(timestamp);
     return myDate.toLocaleString('de-CH');
+  }
+
+  removeUnwantedWebimages(): void {
+    this.captures.forEach(
+      (capture, index, all) => {
+        if (capture.status === WebcamImageStatus.DISCARD) {
+          all.splice(index, 1);
+        }
+      });
+  }
+
+  toggleWebcamImageState(i: number): void {
+    this.captures[i].status += 1;
+    this.captures[i].status %= 3;
+  }
+
+  uploadChosenWebimages(): void {
+    alert('To be implemented');
   }
 }

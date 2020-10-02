@@ -4,7 +4,10 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 ## Stackblitz shareable app URL
 
-[Stackblitz URL](https://angular-ivy-gv4tpd.stackblitz.io)
+[Shareable Stackblitz URL](https://angular-ivy-gv4tpd.stackblitz.io)
+
+## Stackblitz develop: DO NOT SHARE!
+[develop do not share] (https://stackblitz.com/edit/angular-ivy-gv4tpd)
 
 ## Development server
 
