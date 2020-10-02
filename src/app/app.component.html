@@ -2,13 +2,16 @@
   <h1>
     GPS Location and Camera Access
   </h1>
+  <h2>
+    Location
+  </h2>
   <div id="getLocation">
     <button class="actionBtn" (click)="getGeoLocation();">get geo location</button>
     <p *ngIf="singlePosition">[Lat: {{singlePosition.coords.latitude}} Lon: {{singlePosition.coords.longitude}} Alt:
       {{singlePosition.coords.altitude}}] Accuracy: {{singlePosition.coords.accuracy}} Time:
       {{toLocaleString(singlePosition.timestamp)}}
     </p>
-    <p *ngIf="singlePosition">[Relative Lat: {{singlePosition.coords.latitude-47.398912}} Relative Lon:
+    <p *ngIf="singlePosition">[Relative to my desk: Lat: {{singlePosition.coords.latitude-47.398912}} Relative Lon:
       {{singlePosition.coords.longitude-8.5131264}}
     </p>
   </div>
@@ -29,10 +32,6 @@
   </h2>
   <div>
     <div>
-      <button class="actionBtn" (click)="triggerSnapshot();">Take A Snapshot</button>
-      <button class="actionBtn" (click)="toggleWebcam();">Toggle Webcam</button>
-    </div>
-    <div>
       <button class="actionBtn" (click)="showNextWebcam(true);" [disabled]="!multipleWebcamsAvailable">Next Webcam</button>
       <input id="cameraSwitchCheckbox" type="checkbox" [(ngModel)]="allowCameraSwitch"><label for="cameraSwitchCheckbox">Allow Camera Switch</label>
     </div>
@@ -41,18 +40,29 @@
       <input id="deviceId" type="text" [(ngModel)]="deviceId" style="width: 500px">
       <button (click)="showNextWebcam(deviceId);">Activate</button>
     </div>
+    <p>In the actual implementation geo location will presumably be tracked automatically, the buttons above are there just for demo purposes</p>
     <div>
+      <button class="actionBtn" (click)="triggerSnapshot();">Take a picture
+      </button>
+    </div>
+    <div class="captureImageDiv">
       <webcam [height]="500" [width]="500" [trigger]="triggerObservable" (imageCapture)="handleImage($event)" *ngIf="showWebcam"
               [allowCameraSwitch]="allowCameraSwitch" [switchCamera]="nextWebcamObservable"
               [videoOptions]="videoOptions"
               [imageQuality]="1"
               (cameraSwitched)="cameraWasSwitched($event)"
-              (initError)="handleInitError($event)"
-      ></webcam>
+              (initError)="handleInitError($event)">
+      </webcam>
     </div>
   </div>
   <h2>Pictures</h2>
   <div class="snapshot" *ngIf="captures.length">
+    <p>Click on preview images to mark them for deletion or upload: Border toggles to green - red - none.</p>
+    <ul>
+      <li>green: select</li>
+      <li>red: delete</li>
+      <li>none: do nothing</li>
+    </ul>
     <ul>
       <li *ngFor="let capture of captures; let i = index">
         <img [src]="capture.webcamImage.imageAsDataUrl" height="50" alt="image just taken" (click)="toggleWebcamImageState(i)"
