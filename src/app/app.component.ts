@@ -1,8 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {Observable, Subject} from 'rxjs';
 import {WebcamImage, WebcamInitError, WebcamUtil} from 'ngx-webcam';
-import {WebcamImageStatus, WebcamImageWithMetaData} from '../type_definitions/webcam-image-with-meta-data';
-import {RectangleState} from '../type_definitions/rectangle-state.enum';
+import {IssueBox, RectangleState, WebcamImageStatus, WebcamImageWithMetaData} from '../type_definitions/webcam-image-with-meta-data';
 
 @Component({
   selector: 'app-root',
@@ -33,13 +32,8 @@ export class AppComponent implements OnInit {
   public captures: Array<WebcamImageWithMetaData> = [];
 
   // user can draw a rectangle on an image, the image comes from the array `captures`
-  public imageIndexToDrawOnto = 0;
+  public captureIndex = 0;
   public leftOffset: number;
-  public rectangleX1: number;
-  public rectangleY1: number;
-  public rectangleX2: number;
-  public rectangleY2: number;
-  public rectangleState = RectangleState.NONE;
 
 
   public ngOnInit(): void {
@@ -74,6 +68,8 @@ export class AppComponent implements OnInit {
     imageWithMeta.webcamImage = webcamImage;
     imageWithMeta.status = WebcamImageStatus.NONE;
     imageWithMeta.location = this.trackedPosition ? JSON.parse(JSON.stringify(this.trackedPosition)) : null; // clone
+    imageWithMeta.issueBox = {} as IssueBox;
+    imageWithMeta.issueBox.state = RectangleState.NONE;
     this.captures.push(imageWithMeta);
   }
 
@@ -132,47 +128,43 @@ export class AppComponent implements OnInit {
   }
 
   selectForDrawingOnto(imageIndex: number): void {
-    this.imageIndexToDrawOnto = imageIndex;
+    this.captureIndex = imageIndex;
   }
 
   onClick($event: MouseEvent): void {
-    if (this.rectangleState === RectangleState.NONE) {
+    const issueBox = this.captures[this.captureIndex].issueBox;
+    if (issueBox.state === RectangleState.NONE) {
       this.leftOffset = $event.pageX - $event.offsetX;
-      this.rectangleX2 = this.rectangleX1 = $event.offsetX;
-      this.rectangleY2 = this.rectangleY1 = $event.offsetY;
+      issueBox.x2 = issueBox.x1 = $event.offsetX;
+      issueBox.y2 = issueBox.y1 = $event.offsetY;
     }
-    this.rectangleState++;
-    this.rectangleState %= 3;
+    issueBox.state++;
+    issueBox.state %= 3;
   }
 
   onMouseMove($event: MouseEvent): void {
-    if (this.rectangleState === RectangleState.ONE_CORNER) {
-      this.rectangleX2 = $event.offsetX;
-      this.rectangleY2 = $event.offsetY;
+    if (this.captures[this.captureIndex].issueBox.state === RectangleState.ONE_CORNER) {
+      this.captures[this.captureIndex].issueBox.x2 = $event.offsetX;
+      this.captures[this.captureIndex].issueBox.y2 = $event.offsetY;
     }
   }
 
 
   getRectangleTop(): number {
-    return Math.min(this.rectangleY1, this.rectangleY2);
+    return Math.min(this.captures[this.captureIndex].issueBox.y1, this.captures[this.captureIndex].issueBox.y2);
   }
 
   getRectangleLeft(): number {
-    return this.leftOffset + Math.min(this.rectangleX1, this.rectangleX2);
+    return this.leftOffset
+      + Math.min(this.captures[this.captureIndex].issueBox.x1, this.captures[this.captureIndex].issueBox.x2);
   }
 
   getRectangleWidth(): number {
-    return Math.abs(this.rectangleX2 - this.rectangleX1);
+    return Math.abs(this.captures[this.captureIndex].issueBox.x2 - this.captures[this.captureIndex].issueBox.x1);
   }
 
   getRectangleHeight(): number {
-    return Math.abs(this.rectangleY2 - this.rectangleY1);
+    return Math.abs(this.captures[this.captureIndex].issueBox.y2 - this.captures[this.captureIndex].issueBox.y1);
   }
 
-  acceptIssueBox(): void {
-    this.captures[this.imageIndexToDrawOnto].issueBox.x1 = this.rectangleX1;
-    this.captures[this.imageIndexToDrawOnto].issueBox.x2 = this.rectangleX2;
-    this.captures[this.imageIndexToDrawOnto].issueBox.y1 = this.rectangleY1;
-    this.captures[this.imageIndexToDrawOnto].issueBox.y2 = this.rectangleY2;
-  }
 }

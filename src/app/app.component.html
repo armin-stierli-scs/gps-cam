@@ -68,17 +68,24 @@
   <button *ngIf="captures.length" (click)="uploadChosenWebImages();">Send chosen images</button>
 
   <div class="imageWithRectangle" *ngIf="captures.length">
-    <img [src]="captures[imageIndexToDrawOnto].webcamImage.imageAsDataUrl" height="500" alt="image with rectangle"
+    <img [src]="captures[captureIndex].webcamImage.imageAsDataUrl" height="500" alt="image with rectangle"
          (click)="onClick($event)"
          (mousemove)="onMouseMove($event)">
-    <div *ngIf="rectangleState" class="issueBox"
+    <div *ngIf="captures[captureIndex].issueBox.state" class="issueBox"
          [style.top.px]="getRectangleTop()"
          [style.left.px]="getRectangleLeft()"
          [style.width.px]="getRectangleWidth()"
          [style.height.px]="getRectangleHeight()">
     </div>
-    <p>state:{{rectangleState}} ({{rectangleX1}}, {{rectangleY1}}), ({{rectangleX2}}, {{rectangleY2}})</p>
-    <button class="actionBtn" (click)="acceptIssueBox()">Accept</button>
+    <ng-container *ngIf="captures.length">
+      <p *ngIf="captures[captureIndex].issueBox as box">state:{{captures[captureIndex].issueBox.state}} ({{captures[captureIndex].issueBox.x1}},
+        {{captures[captureIndex].issueBox.y1}}),
+        ({{captures[captureIndex].issueBox.x2}}, {{captures[captureIndex].issueBox.y2}})
+
+        {{box.x1}}
+      </p>
+    </ng-container>
+
   </div>
 
   <h4 *ngIf="webcamErrors.length > 0">Messages:</h4>
