@@ -19,6 +19,11 @@ li {
   list-style-type: none;
 }
 
+.colored_frame_0 {
+  border-style: solid;
+  border-color: transparent;
+}
+
 .colored_frame_1 {
   border-style: solid;
   border-color: lawngreen;
@@ -39,4 +44,15 @@ li {
   border-style: solid;
   border-color: orange;
   border-width: 2px;
+}
+
+.miniature {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.miniature button{
+  margin: 4px;
 }

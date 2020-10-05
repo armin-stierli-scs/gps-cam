@@ -57,7 +57,7 @@
       <li>none: do nothing</li>
     </ul>
     <ul>
-      <li *ngFor="let capture of captures; let i = index">
+      <li *ngFor="let capture of captures; let i = index" class="miniature">
         <img [src]="capture.webcamImage.imageAsDataUrl" height="50" alt="image just taken" (click)="toggleWebcamImageState(i)"
              [class]="'colored_frame_'+capture.status"/>
         <button class="actionBtn" (click)="selectForDrawingOnto(i)">Draw box onto this image</button>
