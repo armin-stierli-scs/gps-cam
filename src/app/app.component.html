@@ -68,9 +68,11 @@
   <button *ngIf="captures.length" (click)="uploadChosenWebImages();">Send chosen images</button>
 
   <div class="imageWithRectangle" *ngIf="captures.length">
-    <img [src]="captures[captureIndex].webcamImage.imageAsDataUrl" height="500" alt="image with rectangle"
-         (click)="onClick($event)"
-         (mousemove)="onMouseMove($event)">
+    <img [src]="captures[captureIndex].webcamImage.imageAsDataUrl" alt="image with rectangle"
+         (mousedown)="startDragging($event)"
+         (mouseup)="finalizeRectangle($event)"
+         (mousemove)="onMouseMove($event)"
+    >
     <div *ngIf="captures[captureIndex].issueBox.state" class="issueBox"
          [style.top.px]="getRectangleTop()"
          [style.left.px]="getRectangleLeft()"
@@ -78,11 +80,9 @@
          [style.height.px]="getRectangleHeight()">
     </div>
     <ng-container *ngIf="captures.length">
-      <p *ngIf="captures[captureIndex].issueBox as box">state:{{captures[captureIndex].issueBox.state}} ({{captures[captureIndex].issueBox.x1}},
-        {{captures[captureIndex].issueBox.y1}}),
-        ({{captures[captureIndex].issueBox.x2}}, {{captures[captureIndex].issueBox.y2}})
-
-        {{box.x1}}
+      <p *ngIf="captures[captureIndex].issueBox as box">state:{{box.state}} ({{box.x1}},
+        {{box.y1}}),
+        ({{box.x2}}, {{box.y2}})
       </p>
     </ng-container>
 

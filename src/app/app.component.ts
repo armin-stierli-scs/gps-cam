@@ -131,24 +131,6 @@ export class AppComponent implements OnInit {
     this.captureIndex = imageIndex;
   }
 
-  onClick($event: MouseEvent): void {
-    const issueBox = this.captures[this.captureIndex].issueBox;
-    if (issueBox.state === RectangleState.NONE) {
-      this.leftOffset = $event.pageX - $event.offsetX;
-      issueBox.x2 = issueBox.x1 = $event.offsetX;
-      issueBox.y2 = issueBox.y1 = $event.offsetY;
-    }
-    issueBox.state++;
-    issueBox.state %= 3;
-  }
-
-  onMouseMove($event: MouseEvent): void {
-    if (this.captures[this.captureIndex].issueBox.state === RectangleState.ONE_CORNER) {
-      this.captures[this.captureIndex].issueBox.x2 = $event.offsetX;
-      this.captures[this.captureIndex].issueBox.y2 = $event.offsetY;
-    }
-  }
-
 
   getRectangleTop(): number {
     return Math.min(this.captures[this.captureIndex].issueBox.y1, this.captures[this.captureIndex].issueBox.y2);
@@ -165,6 +147,32 @@ export class AppComponent implements OnInit {
 
   getRectangleHeight(): number {
     return Math.abs(this.captures[this.captureIndex].issueBox.y2 - this.captures[this.captureIndex].issueBox.y1);
+  }
+
+  startDragging($event: MouseEvent): void {
+    $event.preventDefault();
+    this.leftOffset = $event.pageX - $event.offsetX;
+    const issueBox = this.captures[this.captureIndex].issueBox;
+    issueBox.state = RectangleState.ONE_CORNER;
+    issueBox.x2 = issueBox.x1 = $event.offsetX;
+    issueBox.y2 = issueBox.y1 = $event.offsetY;
+  }
+
+  onMouseMove($event: MouseEvent): void {
+    const issueBox = this.captures[this.captureIndex].issueBox;
+    if (issueBox.state === RectangleState.ONE_CORNER) {
+      issueBox.x2 = $event.offsetX;
+      issueBox.y2 = $event.offsetY;
+    }
+  }
+
+  finalizeRectangle($event: MouseEvent): void {
+    $event.preventDefault();
+    if (this.getRectangleWidth() + this.getRectangleHeight() > 0) {
+      this.captures[this.captureIndex].issueBox.state = RectangleState.BOTH_CORNERS;
+    } else {
+      this.captures[this.captureIndex].issueBox.state = RectangleState.NONE;
+    }
   }
 
 }
