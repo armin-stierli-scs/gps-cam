@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {Observable, Subject} from 'rxjs';
 import {WebcamImage, WebcamInitError, WebcamUtil} from 'ngx-webcam';
 import {WebcamImageStatus, WebcamImageWithMetaData} from '../type_definitions/webcam-image-with-meta-data';
+import {RectangleState} from '../type_definitions/rectangle-state.enum';
 
 @Component({
   selector: 'app-root',
@@ -30,6 +31,15 @@ export class AppComponent implements OnInit {
   // switch to next / previous / specific webcam; true/false: forward/backwards, string: deviceId
   private nextWebcam: Subject<boolean|string> = new Subject<boolean|string>();
   public captures: Array<WebcamImageWithMetaData> = [];
+
+  // user can draw a rectangle on an image, the image comes from the array `captures`
+  public imageIndexToDrawOnto = 0;
+  public leftOffset: number;
+  public rectangleX1: number;
+  public rectangleY1: number;
+  public rectangleX2: number;
+  public rectangleY2: number;
+  public rectangleState = RectangleState.NONE;
 
 
   public ngOnInit(): void {
@@ -119,5 +129,50 @@ export class AppComponent implements OnInit {
 
   uploadChosenWebImages(): void {
     alert('To be implemented');
+  }
+
+  selectForDrawingOnto(imageIndex: number): void {
+    this.imageIndexToDrawOnto = imageIndex;
+  }
+
+  onClick($event: MouseEvent): void {
+    if (this.rectangleState === RectangleState.NONE) {
+      this.leftOffset = $event.pageX - $event.offsetX;
+      this.rectangleX2 = this.rectangleX1 = $event.offsetX;
+      this.rectangleY2 = this.rectangleY1 = $event.offsetY;
+    }
+    this.rectangleState++;
+    this.rectangleState %= 3;
+  }
+
+  onMouseMove($event: MouseEvent): void {
+    if (this.rectangleState === RectangleState.ONE_CORNER) {
+      this.rectangleX2 = $event.offsetX;
+      this.rectangleY2 = $event.offsetY;
+    }
+  }
+
+
+  getRectangleTop(): number {
+    return Math.min(this.rectangleY1, this.rectangleY2);
+  }
+
+  getRectangleLeft(): number {
+    return this.leftOffset + Math.min(this.rectangleX1, this.rectangleX2);
+  }
+
+  getRectangleWidth(): number {
+    return Math.abs(this.rectangleX2 - this.rectangleX1);
+  }
+
+  getRectangleHeight(): number {
+    return Math.abs(this.rectangleY2 - this.rectangleY1);
+  }
+
+  acceptIssueBox(): void {
+    this.captures[this.imageIndexToDrawOnto].issueBox.x1 = this.rectangleX1;
+    this.captures[this.imageIndexToDrawOnto].issueBox.x2 = this.rectangleX2;
+    this.captures[this.imageIndexToDrawOnto].issueBox.y1 = this.rectangleY1;
+    this.captures[this.imageIndexToDrawOnto].issueBox.y2 = this.rectangleY2;
   }
 }

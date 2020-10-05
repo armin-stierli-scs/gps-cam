@@ -36,13 +36,15 @@
       <button class="actionBtn" (click)="triggerSnapshot();">Take a picture
       </button>
     </div>
-    <div class="captureImageDiv">
+    <div>
       <webcam [height]="500" [width]="500" [trigger]="snapshotTriggerObservable" (imageCapture)="handleImage($event)" *ngIf="showWebcam"
               [allowCameraSwitch]="allowCameraSwitch" [switchCamera]="nextWebcamObservable"
               [videoOptions]="videoOptions"
               [imageQuality]="1"
               (cameraSwitched)="cameraWasSwitched($event)"
-              (initError)="handleInitError($event)">
+              (initError)="handleInitError($event)"
+              (imageClick)="triggerSnapshot()"
+      >
       </webcam>
     </div>
   </div>
@@ -58,11 +60,26 @@
       <li *ngFor="let capture of captures; let i = index">
         <img [src]="capture.webcamImage.imageAsDataUrl" height="50" alt="image just taken" (click)="toggleWebcamImageState(i)"
              [class]="'colored_frame_'+capture.status"/>
+        <button class="actionBtn" (click)="selectForDrawingOnto(i)">Draw box onto this image</button>
       </li>
     </ul>
   </div>
   <button *ngIf="captures.length" (click)="removeUnwantedWebImages();">Remove unwanted images</button>
   <button *ngIf="captures.length" (click)="uploadChosenWebImages();">Send chosen images</button>
+
+  <div class="imageWithRectangle" *ngIf="captures.length">
+    <img [src]="captures[imageIndexToDrawOnto].webcamImage.imageAsDataUrl" height="500" alt="image with rectangle"
+         (click)="onClick($event)"
+         (mousemove)="onMouseMove($event)">
+    <div *ngIf="rectangleState" class="issueBox"
+         [style.top.px]="getRectangleTop()"
+         [style.left.px]="getRectangleLeft()"
+         [style.width.px]="getRectangleWidth()"
+         [style.height.px]="getRectangleHeight()">
+    </div>
+    <p>state:{{rectangleState}} ({{rectangleX1}}, {{rectangleY1}}), ({{rectangleX2}}, {{rectangleY2}})</p>
+    <button class="actionBtn" (click)="acceptIssueBox()">Accept</button>
+  </div>
 
   <h4 *ngIf="webcamErrors.length > 0">Messages:</h4>
   <ul *ngFor="let error of webcamErrors">
