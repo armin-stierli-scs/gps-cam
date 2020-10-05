@@ -13,13 +13,12 @@ export class AppComponent implements OnInit {
   singlePosition: Position;
   trackedPosition: Position;
   private watchId: number;
-  public geoErrors: WebcamInitError[] = [];
+  public geoErrors: PositionError[] = [];
 
   // toggle webcam on/off
   public showWebcam = true;
   public allowCameraSwitch = true;
   public multipleWebcamsAvailable = false;
-  public deviceId: string;
   public videoOptions: MediaTrackConstraints = {
     // width: {ideal: 1024},
     // height: {ideal: 576}
@@ -27,7 +26,7 @@ export class AppComponent implements OnInit {
   public webcamErrors: WebcamInitError[] = [];
 
   // webcam snapshot trigger
-  private trigger: Subject<void> = new Subject<void>();
+  private snapshotTrigger: Subject<void> = new Subject<void>();
   // switch to next / previous / specific webcam; true/false: forward/backwards, string: deviceId
   private nextWebcam: Subject<boolean|string> = new Subject<boolean|string>();
   public captures: Array<WebcamImageWithMetaData> = [];
@@ -41,7 +40,7 @@ export class AppComponent implements OnInit {
   }
 
   public triggerSnapshot(): void {
-    this.trigger.next();
+    this.snapshotTrigger.next();
   }
 
   public toggleWebcam(): void {
@@ -70,11 +69,10 @@ export class AppComponent implements OnInit {
 
   public cameraWasSwitched(deviceId: string): void {
     console.log('active device: ' + deviceId);
-    this.deviceId = deviceId;
   }
 
-  public get triggerObservable(): Observable<void> {
-    return this.trigger.asObservable();
+  public get snapshotTriggerObservable(): Observable<void> {
+    return this.snapshotTrigger.asObservable();
   }
 
   public get nextWebcamObservable(): Observable<boolean|string> {
@@ -87,7 +85,8 @@ export class AppComponent implements OnInit {
     }
 
     navigator.geolocation.getCurrentPosition(
-      position => this.singlePosition = position
+      position => this.singlePosition = position,
+      error => this.geoErrors.push(error)
     );
   }
 
@@ -104,7 +103,7 @@ export class AppComponent implements OnInit {
     return myDate.toLocaleString('de-CH');
   }
 
-  removeUnwantedWebimages(): void {
+  removeUnwantedWebImages(): void {
     this.captures.forEach(
       (capture, index, all) => {
         if (capture.status === WebcamImageStatus.DISCARD) {
@@ -118,7 +117,7 @@ export class AppComponent implements OnInit {
     this.captures[i].status %= 3;
   }
 
-  uploadChosenWebimages(): void {
+  uploadChosenWebImages(): void {
     alert('To be implemented');
   }
 }

@@ -31,22 +31,13 @@
     Cam
   </h2>
   <div>
-    <div>
-      <button class="actionBtn" (click)="showNextWebcam(true);" [disabled]="!multipleWebcamsAvailable">Next Webcam</button>
-      <input id="cameraSwitchCheckbox" type="checkbox" [(ngModel)]="allowCameraSwitch"><label for="cameraSwitchCheckbox">Allow Camera Switch</label>
-    </div>
-    <div>
-      <label for="deviceId">DeviceId: </label>
-      <input id="deviceId" type="text" [(ngModel)]="deviceId" style="width: 500px">
-      <button (click)="showNextWebcam(deviceId);">Activate</button>
-    </div>
     <p>In the actual implementation geo location will presumably be tracked automatically, the buttons above are there just for demo purposes</p>
     <div>
       <button class="actionBtn" (click)="triggerSnapshot();">Take a picture
       </button>
     </div>
     <div class="captureImageDiv">
-      <webcam [height]="500" [width]="500" [trigger]="triggerObservable" (imageCapture)="handleImage($event)" *ngIf="showWebcam"
+      <webcam [height]="500" [width]="500" [trigger]="snapshotTriggerObservable" (imageCapture)="handleImage($event)" *ngIf="showWebcam"
               [allowCameraSwitch]="allowCameraSwitch" [switchCamera]="nextWebcamObservable"
               [videoOptions]="videoOptions"
               [imageQuality]="1"
@@ -70,8 +61,8 @@
       </li>
     </ul>
   </div>
-  <button *ngIf="captures.length" (click)="removeUnwantedWebimages();">Remove unwanted images</button>
-  <button *ngIf="captures.length" (click)="uploadChosenWebimages();">Send chosen images</button>
+  <button *ngIf="captures.length" (click)="removeUnwantedWebImages();">Remove unwanted images</button>
+  <button *ngIf="captures.length" (click)="uploadChosenWebImages();">Send chosen images</button>
 
   <h4 *ngIf="webcamErrors.length > 0">Messages:</h4>
   <ul *ngFor="let error of webcamErrors">
