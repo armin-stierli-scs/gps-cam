@@ -36,6 +36,7 @@ li {
 
 .imageWithRectangle {
   position: relative;
+  touch-action: none;
 }
 
 .issueBox {

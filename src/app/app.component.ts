@@ -178,14 +178,13 @@ export class AppComponent implements OnInit {
 
 
 
-  onFileChanged(event): void {
+  onFileChanged(event: any): void {
     if (event.target.files && event.target.files[0]) {
       const reader = new FileReader();
 
       reader.readAsDataURL(event.target.files[0]); // Read file as data url
       reader.onloadend = (e) => {
         this.imageUrl = e.target.result; // Set image in element
-        // this._changeDetection.markForCheck(); // Is called because ChangeDetection is set to onPush
       };
     }
   }

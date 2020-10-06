@@ -99,12 +99,13 @@
     <input
       style="display: none"
       type="file" (change)="onFileChanged($event)"
-      #fileInput>
+      #fileInput
+      accept="image/*"
+      capture="environment"
+    >
     <button (click)="fileInput.click()">Select file or take a picture</button>
-    <img [src]="imageUrl" alt="image 2 with rectangle"
-         (mousedown)="startDragging($event)"
-         (mouseup)="finalizeRectangle($event)"
-         (mousemove)="onMouseMove($event)"
+    <img *ngIf="imageUrl" [src]="imageUrl" alt="image 2 with rectangle"
+
     >
   </div>
 </div>
