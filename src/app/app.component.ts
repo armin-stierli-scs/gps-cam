@@ -34,6 +34,7 @@ export class AppComponent implements OnInit {
   // user can draw a rectangle on an image, the image comes from the array `captures`
   public captureIndex = 0;
   public leftOffset: number;
+  public imageUrl: string | ArrayBuffer;
 
 
   public ngOnInit(): void {
@@ -175,4 +176,17 @@ export class AppComponent implements OnInit {
     }
   }
 
+
+
+  onFileChanged(event): void {
+    if (event.target.files && event.target.files[0]) {
+      const reader = new FileReader();
+
+      reader.readAsDataURL(event.target.files[0]); // Read file as data url
+      reader.onloadend = (e) => {
+        this.imageUrl = e.target.result; // Set image in element
+        // this._changeDetection.markForCheck(); // Is called because ChangeDetection is set to onPush
+      };
+    }
+  }
 }

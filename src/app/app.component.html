@@ -92,6 +92,21 @@
   <ul *ngFor="let error of webcamErrors">
     <li>{{error | json}}</li>
   </ul>
+
+  <div>
+    <h2>Without ngx-webcam library</h2>
+<!--    <input type="file" accept="image/*" capture="environment">-->
+    <input
+      style="display: none"
+      type="file" (change)="onFileChanged($event)"
+      #fileInput>
+    <button (click)="fileInput.click()">Select file or take a picture</button>
+    <img [src]="imageUrl" alt="image 2 with rectangle"
+         (mousedown)="startDragging($event)"
+         (mouseup)="finalizeRectangle($event)"
+         (mousemove)="onMouseMove($event)"
+    >
+  </div>
 </div>
 
 
