@@ -35,6 +35,8 @@ li {
 }
 
 .imageWithRectangle {
+  width: 100%;
+  touch-action: none;
   position: relative;
 }
 
@@ -47,6 +49,7 @@ li {
 }
 
 .no-scroll {
+  width: 100%;
   user-drag: none;
   user-select: none;
   -moz-user-select: none;

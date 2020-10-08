@@ -189,17 +189,28 @@ export class AppComponent implements OnInit {
     return Math.abs(this.capturesUrl[this.captureIndexUrl].issueBox.y2 - this.capturesUrl[this.captureIndexUrl].issueBox.y1);
   }
 
-  startDraggingWebcamImage($event: MouseEvent): void {
-    $event.stopPropagation();
-    this.leftOffsetWebcam = $event.pageX - $event.offsetX;
-    const issueBox = this.capturesWebcam[this.captureIndexWebcam].issueBox;
-    issueBox.state = RectangleState.ONE_CORNER;
-    issueBox.x2 = issueBox.x1 = $event.offsetX;
-    issueBox.y2 = issueBox.y1 = $event.offsetY;
+  startDraggingWebcamImage($event: MouseEvent | TouchEvent): void {
+    if ($event instanceof TouchEvent) {
+      // this.leftOffsetWebcam = $event.pageX - $event.offsetX;
+      const issueBox = this.capturesWebcam[this.captureIndexWebcam].issueBox;
+      issueBox.state = RectangleState.ONE_CORNER;
+      const touch = $event.targetTouches.item(0);
+
+      console.log(`touchstart fired (${touch.pageX}, ${touch.pageY})`);
+      issueBox.x2 = issueBox.x1 = touch.pageX;
+      issueBox.y2 = issueBox.y1 = touch.pageY;
+    } else {
+      console.log(`mouseDown fired (${$event.offsetX}, ${$event.offsetY})`);
+      this.leftOffsetWebcam = $event.pageX - $event.offsetX;
+      const issueBox = this.capturesWebcam[this.captureIndexWebcam].issueBox;
+      issueBox.state = RectangleState.ONE_CORNER;
+      issueBox.x2 = issueBox.x1 = $event.offsetX;
+      issueBox.y2 = issueBox.y1 = $event.offsetY;
+    }
+
   }
 
   startDraggingUrlImage($event: MouseEvent): void {
-    $event.stopPropagation();
     this.leftOffsetUrl = $event.pageX - $event.offsetX;
     const issueBox = this.capturesUrl[this.captureIndexUrl].issueBox;
     issueBox.state = RectangleState.ONE_CORNER;
@@ -208,7 +219,7 @@ export class AppComponent implements OnInit {
   }
 
   onMouseMoveWebcamImage($event: MouseEvent): void {
-    $event.stopPropagation();
+    console.log(`mouseMove fired (${$event.offsetX}, ${$event.offsetY})`);
     const issueBox = this.capturesWebcam[this.captureIndexWebcam].issueBox;
     if (issueBox.state === RectangleState.ONE_CORNER) {
       issueBox.x2 = $event.offsetX;
@@ -216,7 +227,6 @@ export class AppComponent implements OnInit {
     }
   }
   onMouseMoveUrlImage($event: MouseEvent): void {
-    $event.stopPropagation();
     const issueBox = this.capturesUrl[this.captureIndexUrl].issueBox;
     if (issueBox.state === RectangleState.ONE_CORNER) {
       issueBox.x2 = $event.offsetX;
@@ -224,7 +234,8 @@ export class AppComponent implements OnInit {
     }
   }
 
-  finalizeRectangleWebcamImage(): void {
+  finalizeRectangleWebcamImage($event: MouseEvent): void {
+    console.log(`mouseUp fired (${$event.offsetX}, ${$event.offsetY})`);
     if (this.getRectangleWidthWebcam() + this.getRectangleHeightWebcam() > 0) {
       this.capturesWebcam[this.captureIndexWebcam].issueBox.state = RectangleState.BOTH_CORNERS;
     } else {
@@ -257,7 +268,5 @@ export class AppComponent implements OnInit {
     }
   }
 
-  onTouchMove($event: TouchEvent): void {
-    $event.preventDefault();
-  }
+
 }
