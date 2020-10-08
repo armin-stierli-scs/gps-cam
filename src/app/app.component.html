@@ -28,7 +28,7 @@
   </ul>
 
   <h2>
-    Cam
+    Cam, using ngx-webcam library
   </h2>
   <div>
     <p>In the actual implementation geo location will presumably be tracked automatically, the buttons above are there just for demo purposes</p>
@@ -37,7 +37,7 @@
       </button>
     </div>
     <div>
-      <webcam [height]="500" [width]="500" [trigger]="snapshotTriggerObservable" (imageCapture)="handleImage($event)" *ngIf="showWebcam"
+      <webcam [height]="500" [width]="500" [trigger]="snapshotTriggerObservable" (imageCapture)="handleWebcamImage($event)" *ngIf="showWebcam"
               [allowCameraSwitch]="allowCameraSwitch" [switchCamera]="nextWebcamObservable"
               [videoOptions]="videoOptions"
               [imageQuality]="1"
@@ -48,8 +48,8 @@
       </webcam>
     </div>
   </div>
-  <h2>Pictures</h2>
-  <div class="snapshot" *ngIf="captures.length">
+  <h2>Pictures, coming from ngx-webcam</h2>
+  <div class="snapshot" *ngIf="capturesWebcam.length">
     <p>Click on preview images to mark them for deletion or upload: Border toggles to green - red - none.</p>
     <ul>
       <li>green: select</li>
@@ -57,30 +57,30 @@
       <li>none: do nothing</li>
     </ul>
     <ul>
-      <li *ngFor="let capture of captures; let i = index" class="miniature">
+      <li *ngFor="let capture of capturesWebcam; let i = index" class="miniature">
         <img [src]="capture.webcamImage.imageAsDataUrl" height="50" alt="image just taken" (click)="toggleWebcamImageState(i)"
              [class]="'colored_frame_'+capture.status"/>
-        <button class="actionBtn" (click)="selectForDrawingOnto(i)">Draw box onto this image</button>
+        <button class="actionBtn" (click)="selectForDrawingOntoWebcamImage(i)">Draw box onto this image</button>
       </li>
     </ul>
   </div>
-  <button *ngIf="captures.length" (click)="removeUnwantedWebImages();">Remove unwanted images</button>
-  <button *ngIf="captures.length" (click)="uploadChosenWebImages();">Send chosen images</button>
+  <button *ngIf="capturesWebcam.length" (click)="removeUnwantedWebImages();">Remove unwanted images</button>
+  <button *ngIf="capturesWebcam.length" (click)="uploadChosenImages();">Send chosen images</button>
 
-  <div class="imageWithRectangle" *ngIf="captures.length">
-    <img [src]="captures[captureIndex].webcamImage.imageAsDataUrl" alt="image with rectangle"
-         (mousedown)="startDragging($event)"
-         (mouseup)="finalizeRectangle($event)"
-         (mousemove)="onMouseMove($event)"
+  <div class="imageWithRectangle" *ngIf="capturesWebcam.length && capturesWebcam[captureIndexWebcam]">
+    <img class="no-scroll" [src]="capturesWebcam[captureIndexWebcam].webcamImage.imageAsDataUrl" alt="image with rectangle"
+         (mousedown)="startDraggingWebcamImage($event)"
+         (mouseup)="finalizeRectangleWebcamImage($event)"
+         (mousemove)="onMouseMoveWebcamImage($event)"
     >
-    <div *ngIf="captures[captureIndex].issueBox.state" class="issueBox"
-         [style.top.px]="getRectangleTop()"
-         [style.left.px]="getRectangleLeft()"
-         [style.width.px]="getRectangleWidth()"
-         [style.height.px]="getRectangleHeight()">
+    <div *ngIf="capturesWebcam[captureIndexWebcam].issueBox.state" class="issueBox"
+         [style.top.px]="getRectangleTopWebcam()"
+         [style.left.px]="getRectangleLeftWebcam()"
+         [style.width.px]="getRectangleWidthWebcam()"
+         [style.height.px]="getRectangleHeightWebcam()">
     </div>
-    <ng-container *ngIf="captures.length">
-      <p *ngIf="captures[captureIndex].issueBox as box">state:{{box.state}} ({{box.x1}},
+    <ng-container *ngIf="capturesWebcam.length">
+      <p *ngIf="capturesWebcam[captureIndexWebcam].issueBox as box">state:{{box.state}} ({{box.x1}},
         {{box.y1}}),
         ({{box.x2}}, {{box.y2}})
       </p>
@@ -94,7 +94,7 @@
   </ul>
 
   <div>
-    <h2>Without ngx-webcam library</h2>
+    <h2>Cam, using input element</h2>
 <!--    <input type="file" accept="image/*" capture="environment">-->
     <input
       style="display: none"
@@ -104,9 +104,46 @@
       capture="environment"
     >
     <button (click)="fileInput.click()">Select file or take a picture</button>
-    <img *ngIf="imageUrl" [src]="imageUrl" alt="image 2 with rectangle"
 
+  </div>
+  <h2>Pictures, coming from input element</h2>
+  <div class="snapshot" *ngIf="capturesUrl.length">
+    <p>Click on preview images to mark them for deletion or upload: Border toggles to green - red - none.</p>
+    <ul>
+      <li>green: select</li>
+      <li>red: delete</li>
+      <li>none: do nothing</li>
+    </ul>
+    <ul>
+      <li *ngFor="let capture of capturesUrl; let i = index" class="miniature">
+        <img [src]="capture.imageAsUrl" height="50" alt="image just taken" (click)="toggleUrlImageState(i)"
+             [class]="'colored_frame_'+capture.status"/>
+        <button class="actionBtn" (click)="selectForDrawingOntoUrlImage(i)">Draw box onto this image</button>
+      </li>
+    </ul>
+  </div>
+  <button *ngIf="capturesUrl.length" (click)="removeUnwantedUrlImages();">Remove unwanted images</button>
+  <button *ngIf="capturesUrl.length" (click)="uploadChosenImages();">Send chosen images</button>
+
+  <div class="imageWithRectangle" *ngIf="capturesUrl.length">
+    <img class="no-scroll" [src]="capturesUrl[captureIndexUrl].imageAsUrl" alt="image with rectangle"
+         (mousedown)="startDraggingUrlImage($event)"
+         (mouseup)="finalizeRectangleUrlImage($event)"
+         (mousemove)="onMouseMoveUrlImage($event)"
     >
+    <div *ngIf="capturesUrl[captureIndexUrl].issueBox.state" class="issueBox"
+         [style.top.px]="getRectangleTopUrl()"
+         [style.left.px]="getRectangleLeftUrl()"
+         [style.width.px]="getRectangleWidthUrl()"
+         [style.height.px]="getRectangleHeightUrl()">
+    </div>
+    <ng-container *ngIf="capturesUrl.length">
+      <p *ngIf="capturesUrl[captureIndexUrl].issueBox as box">state:{{box.state}} ({{box.x1}},
+        {{box.y1}}),
+        ({{box.x2}}, {{box.y2}})
+      </p>
+    </ng-container>
+
   </div>
 </div>
 

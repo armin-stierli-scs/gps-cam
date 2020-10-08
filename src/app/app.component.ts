@@ -1,7 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {Observable, Subject} from 'rxjs';
 import {WebcamImage, WebcamInitError, WebcamUtil} from 'ngx-webcam';
-import {IssueBox, RectangleState, WebcamImageStatus, WebcamImageWithMetaData} from '../type_definitions/webcam-image-with-meta-data';
+import {IssueBox, RectangleState, ImageStatus} from '../type_definitions/image-with-meta-data';
+import {WebcamImageWithMetaData} from '../type_definitions/webcam-image-with-meta-data';
+import {UrlImageWithMetaData} from '../type_definitions/url-image-with-meta-data';
 
 @Component({
   selector: 'app-root',
@@ -29,12 +31,15 @@ export class AppComponent implements OnInit {
   private snapshotTrigger: Subject<void> = new Subject<void>();
   // switch to next / previous / specific webcam; true/false: forward/backwards, string: deviceId
   private nextWebcam: Subject<boolean|string> = new Subject<boolean|string>();
-  public captures: Array<WebcamImageWithMetaData> = [];
+  public capturesWebcam: Array<WebcamImageWithMetaData> = [];
 
   // user can draw a rectangle on an image, the image comes from the array `captures`
-  public captureIndex = 0;
-  public leftOffset: number;
-  public imageUrl: string | ArrayBuffer;
+  public captureIndexWebcam = 0;
+  public leftOffsetWebcam: number;
+
+  public capturesUrl: Array<UrlImageWithMetaData> = [];
+  public captureIndexUrl = 0;
+  public leftOffsetUrl: number;
 
 
   public ngOnInit(): void {
@@ -63,15 +68,15 @@ export class AppComponent implements OnInit {
     this.nextWebcam.next(directionOrDeviceId);
   }
 
-  public handleImage(webcamImage: WebcamImage): void {
+  public handleWebcamImage(webcamImage: WebcamImage): void {
     console.log('received webcam image', webcamImage);
     const imageWithMeta = {} as WebcamImageWithMetaData;
     imageWithMeta.webcamImage = webcamImage;
-    imageWithMeta.status = WebcamImageStatus.NONE;
+    imageWithMeta.status = ImageStatus.NONE;
     imageWithMeta.location = this.trackedPosition ? JSON.parse(JSON.stringify(this.trackedPosition)) : null; // clone
     imageWithMeta.issueBox = {} as IssueBox;
     imageWithMeta.issueBox.state = RectangleState.NONE;
-    this.captures.push(imageWithMeta);
+    this.capturesWebcam.push(imageWithMeta);
   }
 
   public cameraWasSwitched(deviceId: string): void {
@@ -111,80 +116,142 @@ export class AppComponent implements OnInit {
   }
 
   removeUnwantedWebImages(): void {
-    this.captures.forEach(
+    this.capturesWebcam.forEach(
       (capture, index, all) => {
-        if (capture.status === WebcamImageStatus.DISCARD) {
+        if (capture.status === ImageStatus.DISCARD) {
+          all.splice(index, 1);
+        }
+      });
+  }
+  removeUnwantedUrlImages(): void {
+    this.capturesUrl.forEach(
+      (capture, index, all) => {
+        if (capture.status === ImageStatus.DISCARD) {
           all.splice(index, 1);
         }
       });
   }
 
   toggleWebcamImageState(i: number): void {
-    this.captures[i].status += 1;
-    this.captures[i].status %= 3;
+    this.capturesWebcam[i].status += 1;
+    this.capturesWebcam[i].status %= 3;
   }
 
-  uploadChosenWebImages(): void {
+  toggleUrlImageState(i: number): void {
+    this.capturesUrl[i].status += 1;
+    this.capturesUrl[i].status %= 3;
+  }
+
+  uploadChosenImages(): void {
     alert('To be implemented');
   }
 
-  selectForDrawingOnto(imageIndex: number): void {
-    this.captureIndex = imageIndex;
+  selectForDrawingOntoWebcamImage(imageIndex: number): void {
+    this.captureIndexWebcam = imageIndex;
+  }
+
+  selectForDrawingOntoUrlImage(imageIndex: number): void {
+    this.captureIndexUrl = imageIndex;
   }
 
 
-  getRectangleTop(): number {
-    return Math.min(this.captures[this.captureIndex].issueBox.y1, this.captures[this.captureIndex].issueBox.y2);
+  getRectangleTopWebcam(): number {
+    return Math.min(this.capturesWebcam[this.captureIndexWebcam].issueBox.y1, this.capturesWebcam[this.captureIndexWebcam].issueBox.y2);
   }
 
-  getRectangleLeft(): number {
-    return this.leftOffset
-      + Math.min(this.captures[this.captureIndex].issueBox.x1, this.captures[this.captureIndex].issueBox.x2);
+  getRectangleLeftWebcam(): number {
+    return this.leftOffsetWebcam
+      + Math.min(this.capturesWebcam[this.captureIndexWebcam].issueBox.x1, this.capturesWebcam[this.captureIndexWebcam].issueBox.x2);
   }
 
-  getRectangleWidth(): number {
-    return Math.abs(this.captures[this.captureIndex].issueBox.x2 - this.captures[this.captureIndex].issueBox.x1);
+  getRectangleWidthWebcam(): number {
+    return Math.abs(this.capturesWebcam[this.captureIndexWebcam].issueBox.x2 - this.capturesWebcam[this.captureIndexWebcam].issueBox.x1);
   }
 
-  getRectangleHeight(): number {
-    return Math.abs(this.captures[this.captureIndex].issueBox.y2 - this.captures[this.captureIndex].issueBox.y1);
+  getRectangleHeightWebcam(): number {
+    return Math.abs(this.capturesWebcam[this.captureIndexWebcam].issueBox.y2 - this.capturesWebcam[this.captureIndexWebcam].issueBox.y1);
   }
 
-  startDragging($event: MouseEvent): void {
+  getRectangleTopUrl(): number {
+    return Math.min(this.capturesUrl[this.captureIndexUrl].issueBox.y1, this.capturesUrl[this.captureIndexUrl].issueBox.y2);
+  }
+
+  getRectangleLeftUrl(): number {
+    return this.leftOffsetUrl
+      + Math.min(this.capturesUrl[this.captureIndexUrl].issueBox.x1, this.capturesUrl[this.captureIndexUrl].issueBox.x2);
+  }
+
+  getRectangleWidthUrl(): number {
+    return Math.abs(this.capturesUrl[this.captureIndexUrl].issueBox.x2 - this.capturesUrl[this.captureIndexUrl].issueBox.x1);
+  }
+
+  getRectangleHeightUrl(): number {
+    return Math.abs(this.capturesUrl[this.captureIndexUrl].issueBox.y2 - this.capturesUrl[this.captureIndexUrl].issueBox.y1);
+  }
+
+  startDraggingWebcamImage($event: MouseEvent): void {
     $event.preventDefault();
-    this.leftOffset = $event.pageX - $event.offsetX;
-    const issueBox = this.captures[this.captureIndex].issueBox;
+    this.leftOffsetWebcam = $event.pageX - $event.offsetX;
+    const issueBox = this.capturesWebcam[this.captureIndexWebcam].issueBox;
+    issueBox.state = RectangleState.ONE_CORNER;
+    issueBox.x2 = issueBox.x1 = $event.offsetX;
+    issueBox.y2 = issueBox.y1 = $event.offsetY;
+  }
+  startDraggingUrlImage($event: MouseEvent): void {
+    $event.preventDefault();
+    this.leftOffsetUrl = $event.pageX - $event.offsetX;
+    const issueBox = this.capturesUrl[this.captureIndexUrl].issueBox;
     issueBox.state = RectangleState.ONE_CORNER;
     issueBox.x2 = issueBox.x1 = $event.offsetX;
     issueBox.y2 = issueBox.y1 = $event.offsetY;
   }
 
-  onMouseMove($event: MouseEvent): void {
-    const issueBox = this.captures[this.captureIndex].issueBox;
+  onMouseMoveWebcamImage($event: MouseEvent): void {
+    const issueBox = this.capturesWebcam[this.captureIndexWebcam].issueBox;
+    if (issueBox.state === RectangleState.ONE_CORNER) {
+      issueBox.x2 = $event.offsetX;
+      issueBox.y2 = $event.offsetY;
+    }
+  }
+  onMouseMoveUrlImage($event: MouseEvent): void {
+    const issueBox = this.capturesUrl[this.captureIndexUrl].issueBox;
     if (issueBox.state === RectangleState.ONE_CORNER) {
       issueBox.x2 = $event.offsetX;
       issueBox.y2 = $event.offsetY;
     }
   }
 
-  finalizeRectangle($event: MouseEvent): void {
+  finalizeRectangleWebcamImage($event: MouseEvent): void {
     $event.preventDefault();
-    if (this.getRectangleWidth() + this.getRectangleHeight() > 0) {
-      this.captures[this.captureIndex].issueBox.state = RectangleState.BOTH_CORNERS;
+    if (this.getRectangleWidthWebcam() + this.getRectangleHeightWebcam() > 0) {
+      this.capturesWebcam[this.captureIndexWebcam].issueBox.state = RectangleState.BOTH_CORNERS;
     } else {
-      this.captures[this.captureIndex].issueBox.state = RectangleState.NONE;
+      this.capturesWebcam[this.captureIndexWebcam].issueBox.state = RectangleState.NONE;
     }
   }
 
-
+  finalizeRectangleUrlImage($event: MouseEvent): void {
+    $event.preventDefault();
+    if (this.getRectangleWidthUrl() + this.getRectangleHeightUrl() > 0) {
+      this.capturesUrl[this.captureIndexUrl].issueBox.state = RectangleState.BOTH_CORNERS;
+    } else {
+      this.capturesUrl[this.captureIndexUrl].issueBox.state = RectangleState.NONE;
+    }
+  }
 
   onFileChanged(event: any): void {
     if (event.target.files && event.target.files[0]) {
       const reader = new FileReader();
-
       reader.readAsDataURL(event.target.files[0]); // Read file as data url
       reader.onloadend = (e) => {
-        this.imageUrl = e.target.result; // Set image in element
+        const urlImage = e.target.result;
+        const imageWithMeta = {} as UrlImageWithMetaData;
+        imageWithMeta.imageAsUrl = urlImage;
+        imageWithMeta.status = ImageStatus.NONE;
+        imageWithMeta.location = this.trackedPosition ? JSON.parse(JSON.stringify(this.trackedPosition)) : null; // clone
+        imageWithMeta.issueBox = {} as IssueBox;
+        imageWithMeta.issueBox.state = RectangleState.NONE;
+        this.capturesUrl.push(imageWithMeta);
       };
     }
   }
