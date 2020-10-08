@@ -256,4 +256,8 @@ export class AppComponent implements OnInit {
       };
     }
   }
+
+  onTouchMove($event: TouchEvent): void {
+    $event.preventDefault();
+  }
 }

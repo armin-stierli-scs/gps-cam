@@ -71,6 +71,7 @@
     <img class="no-scroll" [src]="capturesWebcam[captureIndexWebcam].webcamImage.imageAsDataUrl" alt="image with rectangle"
          (mousedown)="startDraggingWebcamImage($event)"
          (mousemove)="onMouseMoveWebcamImage($event)"
+         (touchmove)="onTouchMove($event)"
          (mouseup)="finalizeRectangleWebcamImage()"
     >
     <div *ngIf="capturesWebcam[captureIndexWebcam].issueBox.state" class="issueBox"
@@ -129,6 +130,7 @@
     <img class="no-scroll" [src]="capturesUrl[captureIndexUrl].imageAsUrl" alt="image with rectangle"
          (mousedown)="startDraggingUrlImage($event)"
          (mousemove)="onMouseMoveUrlImage($event)"
+         (touchmove)="onTouchMove($event)"
          (mouseup)="finalizeRectangleUrlImage()"
     >
     <div *ngIf="capturesUrl[captureIndexUrl].issueBox.state" class="issueBox"
