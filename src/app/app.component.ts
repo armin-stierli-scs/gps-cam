@@ -190,6 +190,7 @@ export class AppComponent implements OnInit {
   }
 
   startDraggingWebcamImage($event: MouseEvent): void {
+    $event.stopPropagation();
     this.leftOffsetWebcam = $event.pageX - $event.offsetX;
     const issueBox = this.capturesWebcam[this.captureIndexWebcam].issueBox;
     issueBox.state = RectangleState.ONE_CORNER;
@@ -198,6 +199,7 @@ export class AppComponent implements OnInit {
   }
 
   startDraggingUrlImage($event: MouseEvent): void {
+    $event.stopPropagation();
     this.leftOffsetUrl = $event.pageX - $event.offsetX;
     const issueBox = this.capturesUrl[this.captureIndexUrl].issueBox;
     issueBox.state = RectangleState.ONE_CORNER;
@@ -206,6 +208,7 @@ export class AppComponent implements OnInit {
   }
 
   onMouseMoveWebcamImage($event: MouseEvent): void {
+    $event.stopPropagation();
     const issueBox = this.capturesWebcam[this.captureIndexWebcam].issueBox;
     if (issueBox.state === RectangleState.ONE_CORNER) {
       issueBox.x2 = $event.offsetX;
@@ -213,6 +216,7 @@ export class AppComponent implements OnInit {
     }
   }
   onMouseMoveUrlImage($event: MouseEvent): void {
+    $event.stopPropagation();
     const issueBox = this.capturesUrl[this.captureIndexUrl].issueBox;
     if (issueBox.state === RectangleState.ONE_CORNER) {
       issueBox.x2 = $event.offsetX;
