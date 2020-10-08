@@ -190,15 +190,14 @@ export class AppComponent implements OnInit {
   }
 
   startDraggingWebcamImage($event: MouseEvent): void {
-    $event.preventDefault();
     this.leftOffsetWebcam = $event.pageX - $event.offsetX;
     const issueBox = this.capturesWebcam[this.captureIndexWebcam].issueBox;
     issueBox.state = RectangleState.ONE_CORNER;
     issueBox.x2 = issueBox.x1 = $event.offsetX;
     issueBox.y2 = issueBox.y1 = $event.offsetY;
   }
+
   startDraggingUrlImage($event: MouseEvent): void {
-    $event.preventDefault();
     this.leftOffsetUrl = $event.pageX - $event.offsetX;
     const issueBox = this.capturesUrl[this.captureIndexUrl].issueBox;
     issueBox.state = RectangleState.ONE_CORNER;
@@ -221,8 +220,7 @@ export class AppComponent implements OnInit {
     }
   }
 
-  finalizeRectangleWebcamImage($event: MouseEvent): void {
-    $event.preventDefault();
+  finalizeRectangleWebcamImage(): void {
     if (this.getRectangleWidthWebcam() + this.getRectangleHeightWebcam() > 0) {
       this.capturesWebcam[this.captureIndexWebcam].issueBox.state = RectangleState.BOTH_CORNERS;
     } else {
@@ -230,8 +228,7 @@ export class AppComponent implements OnInit {
     }
   }
 
-  finalizeRectangleUrlImage($event: MouseEvent): void {
-    $event.preventDefault();
+  finalizeRectangleUrlImage(): void {
     if (this.getRectangleWidthUrl() + this.getRectangleHeightUrl() > 0) {
       this.capturesUrl[this.captureIndexUrl].issueBox.state = RectangleState.BOTH_CORNERS;
     } else {

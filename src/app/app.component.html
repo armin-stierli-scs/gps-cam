@@ -70,8 +70,8 @@
   <div class="imageWithRectangle" *ngIf="capturesWebcam.length && capturesWebcam[captureIndexWebcam]">
     <img class="no-scroll" [src]="capturesWebcam[captureIndexWebcam].webcamImage.imageAsDataUrl" alt="image with rectangle"
          (mousedown)="startDraggingWebcamImage($event)"
-         (mouseup)="finalizeRectangleWebcamImage($event)"
          (mousemove)="onMouseMoveWebcamImage($event)"
+         (mouseup)="finalizeRectangleWebcamImage()"
     >
     <div *ngIf="capturesWebcam[captureIndexWebcam].issueBox.state" class="issueBox"
          [style.top.px]="getRectangleTopWebcam()"
@@ -128,8 +128,8 @@
   <div class="imageWithRectangle" *ngIf="capturesUrl.length">
     <img class="no-scroll" [src]="capturesUrl[captureIndexUrl].imageAsUrl" alt="image with rectangle"
          (mousedown)="startDraggingUrlImage($event)"
-         (mouseup)="finalizeRectangleUrlImage($event)"
          (mousemove)="onMouseMoveUrlImage($event)"
+         (mouseup)="finalizeRectangleUrlImage()"
     >
     <div *ngIf="capturesUrl[captureIndexUrl].issueBox.state" class="issueBox"
          [style.top.px]="getRectangleTopUrl()"
